@@ -1,24 +1,37 @@
 # hid_rapoo
 
-Battery reporting for Rapoo VT3 MAX Gen-2. 
+Battery reporting for Rapoo Gaming Mouses
 
-Tested on Fedora Linux 43.
+Tested on Arch Linux and Fedora Linux 43.
+
+## Supported Devices
+
+| Device        | USB ID (VID:PID) |
+| ------------- | ---------------- |
+| VT3 Pro       | 24ae:1215        |
+| VT3 Pro Max   | 24ae:1244        |
+| VT3 Max Gen-2 | 24ae:3102        |
+| VT9 Pro       | 24ae:1417        |
+| VT9 Pro Mini  | 24ae:3103        |
 
 ## Prerequisites
 
 Install kernel headers and DKMS:
 
 **Fedora/RHEL:**
+
 ```bash
 sudo dnf install kernel-devel kernel-headers dkms
 ```
 
 **Ubuntu/Debian:**
+
 ```bash
 sudo apt install linux-headers-$(uname -r) dkms
 ```
 
 **Arch:**
+
 ```bash
 sudo pacman -S linux-headers dkms
 ```
@@ -32,6 +45,7 @@ sudo ./install-dkms.sh
 ```
 
 To verify installation:
+
 ```bash
 lsmod | grep hid_rapoo
 modinfo hid_rapoo
@@ -53,29 +67,7 @@ sudo insmod hid_rapoo.ko
 ```
 
 To remove:
+
 ```bash
 sudo rmmod hid_rapoo
-```
-
-# Testing
-
-Might work with other Rapoo devices (you try). Should be safe since it's only reading the information.
-
-Modify:
-```c
-// hid_rapoo.c
-// ...
-
-#define USB_VENDOR_ID_RAPOO  0x24ae
-#define USB_DEVICE_ID_RAPOO_VT3_MAX_GEN2 0x1417 // add your device ID
-
-// ...
-
-static const struct hid_device_id rapoo_devices[] = {
-    { HID_USB_DEVICE(USB_VENDOR_ID_RAPOO, USB_DEVICE_ID_RAPOO_VT3_MAX_GEN2) },
-    // add your device here
-    { }
-};
-
-// ...
 ```
