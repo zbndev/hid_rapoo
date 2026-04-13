@@ -3,7 +3,7 @@
 set -e
 
 MODULE_NAME="hid-rapoo"
-MODULE_VERSION="1.0.0"
+MODULE_VERSION="1.1.0"
 
 if [ "$EUID" -ne 0 ]; then
     echo "Please run as root (use sudo)"

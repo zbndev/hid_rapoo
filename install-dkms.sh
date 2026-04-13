@@ -3,7 +3,7 @@
 set -e
 
 MODULE_NAME="hid-rapoo"
-MODULE_VERSION="1.0.0"
+MODULE_VERSION="1.1.0"
 DKMS_DIR="/usr/src/${MODULE_NAME}-${MODULE_VERSION}"
 
 if [ "$EUID" -ne 0 ]; then
