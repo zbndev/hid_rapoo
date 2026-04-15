@@ -23,8 +23,7 @@ struct rapoo_data {
 	const char *model_name;
 };
 
-static int rapoo_raw_event(struct hid_device *hdev, struct hid_report *report,
-			   u8 *data, int size)
+static int rapoo_raw_event(struct hid_device *hdev, struct hid_report *report, u8 *data, int size)
 {
 	struct rapoo_data *rdata = hid_get_drvdata(hdev);
 	if (!rdata)
@@ -44,7 +43,6 @@ static int rapoo_raw_event(struct hid_device *hdev, struct hid_report *report,
 			power_supply_changed(rdata->battery);
 		}
 	}
-
 	return 0;
 }
 
@@ -66,7 +64,6 @@ static int rapoo_get_property(struct power_supply *psy,
 			      union power_supply_propval *val)
 {
 	struct rapoo_data *rdata = power_supply_get_drvdata(psy);
-
 	switch (psp) {
 	case POWER_SUPPLY_PROP_STATUS:
 		if (rdata->battery_charging)
@@ -141,13 +138,16 @@ static int rapoo_probe(struct hid_device *hdev, const struct hid_device_id *id)
 		return ret;
 	}
 
-	if (hdev->collection->usage == HID_GD_MOUSE) {
-		hid_info(hdev, "Skipping mouse interface %s\n", hdev->name);
+	// Battery data is sent over the keyboard interface. So we ignore everything else.
+	if (hdev->collection->usage != HID_GD_KEYBOARD) {
+		hid_info(hdev, "Skipping non-keyboard interface %s\n", hdev->name);
+		// We must return 0 to allow the generic mouse driver to claim the other interfaces.
+        // We set drvdata to NULL so raw_event knows to ignore this interface.
 		hid_set_drvdata(hdev, NULL);
 		return 0;
 	}
 
-	hid_info(hdev, "Found battery interface. Setting up battery reporting.\n");
+	hid_info(hdev, "Found keyboard interface. Setting up battery reporting.\n");
 
 	rdata = devm_kzalloc(&hdev->dev, sizeof(*rdata), GFP_KERNEL);
 	if (!rdata)
@@ -167,8 +167,7 @@ static int rapoo_probe(struct hid_device *hdev, const struct hid_device_id *id)
 	if (!psy_desc)
 		return -ENOMEM;
 
-	psy_desc->name = devm_kasprintf(&hdev->dev, GFP_KERNEL,
-					"rapoo-%04x-%04x", id->vendor, id->product);
+	psy_desc->name = devm_kasprintf(&hdev->dev, GFP_KERNEL, "rapoo-%04x-%04x", id->vendor, id->product);
 	psy_desc->type = POWER_SUPPLY_TYPE_BATTERY;
 	psy_desc->properties = rapoo_psy_properties;
 	psy_desc->num_properties = ARRAY_SIZE(rapoo_psy_properties);
